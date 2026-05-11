@@ -137,4 +137,5 @@ struct proc {
   // TODO, mp3 part 1
   // Put your variable below this comment.
   // Do not add new fields in between the existing fields.
+  int countdown;    // countdown
 };

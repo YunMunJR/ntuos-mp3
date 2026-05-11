@@ -15,6 +15,7 @@ void
 set_process_timer(struct proc *p, int countdown)
 {
   // TODO, mp3 part 1
+  p->countdown = countdown;
 }
 
 extern struct proc proc[];
@@ -92,7 +93,15 @@ usertrap(void)
   // give up the CPU if this is a timer interrupt.
   if(which_dev == 2){
     // TODO, mp3 part 1
-    yield();
+    if(!p->is_real_time){
+      yield();
+    }else{
+      p->countdown--;
+      p->current_exec_ticks++;
+      if(p->countdown == 0 || p->current_exec_ticks >= p->exec_time){
+        rt_yield(p);
+      }
+    }
   }
 
   prepare_return();
@@ -165,7 +174,17 @@ kerneltrap()
   // give up the CPU if this is a timer interrupt.
   if(which_dev == 2 && myproc() != 0){
     // TODO, mp3 part 1
-    yield();
+    struct proc *p = myproc();
+
+    if(!p->is_real_time){
+      yield();
+    }else{
+      p->countdown--;
+      p->current_exec_ticks++;
+      if(p->countdown == 0 || p->current_exec_ticks >= p->exec_time){
+        rt_yield(p);
+      }
+    }
   }
 
   // the yield() may have caused some traps to occur,
